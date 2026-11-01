@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Home · Tomato Leaf AI{% endblock %}
+{% block content %}
+<div class="grain">
+    <section class="mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 lg:px-8 lg:pb-20 lg:pt-16">
+        <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
+            <div>
+                <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-leaf-200 bg-white px-3 py-1.5 text-xs font-extrabold uppercase tracking-[.18em] text-leaf-700"><span class="h-2 w-2 rounded-full bg-clay" aria-hidden="true"></span> Field-friendly leaf scouting</div>
+                <h1 class="max-w-3xl font-display text-4xl font-bold leading-[1.04] tracking-tight text-leaf-900 sm:text-6xl">A calmer way to read a tomato leaf.</h1>
+                <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-600">Upload one clear tomato-leaf photo and get a possible disease match. The model shows a small set of possibilities instead of pretending every image has one certain answer.</p>
+                <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <a href="{{ url_for('analyze') }}" class="inline-flex items-center justify-center rounded-2xl bg-leaf-700 px-6 py-3.5 font-bold text-white shadow-xl shadow-leaf-200 transition hover:-translate-y-0.5 hover:bg-leaf-900">Analyze a leaf <span class="ml-3 text-xl" aria-hidden="true">→</span></a>
+                    <a href="{{ url_for('disease_library') }}" class="inline-flex items-center justify-center rounded-2xl border border-leaf-200 bg-white px-6 py-3.5 font-bold text-leaf-700 hover:bg-leaf-50">Browse the disease library</a>
+                </div>
+                <p class="mt-5 text-sm font-semibold text-slate-500"><span aria-hidden="true">⌁</span> AI-assisted suggestion, not a diagnosis.</p>
+            </div>
+            <div class="relative mx-auto w-full max-w-lg">
+                <div class="absolute -inset-6 rounded-[4rem] bg-leaf-100/70 blur-2xl" aria-hidden="true"></div>
+                <div class="relative overflow-hidden rounded-[2.5rem] border border-white bg-white p-5 shadow-soft">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4"><div><p class="text-xs font-extrabold uppercase tracking-[.18em] text-leaf-600">A simple readout</p><p class="mt-1 font-display text-xl font-bold text-leaf-900">Possible, not absolute</p></div><span class="rounded-full bg-leaf-100 px-3 py-1 text-xs font-bold text-leaf-700">10 classes</span></div>
+                    <div class="mt-5 rounded-3xl bg-[#ecf4e8] p-6"><div class="flex items-center justify-center text-[8rem] leading-none drop-shadow-xl" aria-hidden="true">🍃</div><div class="mx-auto mt-3 max-w-xs rounded-2xl border border-white bg-white p-4 shadow-sm"><div class="flex items-center justify-between"><span class="font-bold text-slate-800">Early blight</span><span class="text-sm font-extrabold text-leaf-700">92%</span></div><div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"><div class="h-full w-[92%] rounded-full bg-clay"></div></div><p class="mt-3 text-xs font-semibold text-slate-500">One possible match · review the photo and plant</p></div></div>
+                    <div class="mt-5 grid grid-cols-3 gap-3 text-center"><div class="rounded-2xl bg-slate-50 p-3"><p class="text-xl font-extrabold text-leaf-700">75%</p><p class="mt-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">target</p></div><div class="rounded-2xl bg-slate-50 p-3"><p class="text-xl font-extrabold text-leaf-700">10</p><p class="mt-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">classes</p></div><div class="rounded-2xl bg-slate-50 p-3"><p class="text-xl font-extrabold text-leaf-700">1</p><p class="mt-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">photo</p></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="border-y border-leaf-100 bg-white">
+        <div class="mx-auto grid max-w-7xl gap-0 px-4 sm:px-6 md:grid-cols-3 lg:px-8">
+            {% for number, title, text in [('01', 'Upload', 'Choose a clear photo of one leaf.'), ('02', 'Analyze', 'Let the model compare its visual patterns.'), ('03', 'Get a result', 'Review possible matches and confidence honestly.')] %}
+            <div class="flex gap-4 border-b border-slate-100 py-6 last:border-0 md:border-b-0 md:border-r md:px-8 md:first:pl-0 md:last:border-r-0 md:last:pr-0"><span class="font-display text-2xl font-bold text-clay">{{ number }}</span><div><h2 class="font-bold text-leaf-900">{{ title }}</h2><p class="mt-1 text-sm leading-6 text-slate-600">{{ text }}</p></div></div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div class="grid gap-10 lg:grid-cols-[.85fr_1.15fr]">
+            <div><p class="text-sm font-extrabold uppercase tracking-[.18em] text-leaf-600">How the result works</p><h2 class="mt-3 font-display text-3xl font-bold tracking-tight text-leaf-900">A set of possibilities is more useful than false certainty.</h2><p class="mt-4 leading-7 text-slate-600">The model compares your image with examples it learned from. A calibrated rule then keeps the most plausible candidates together, so an uncertain image can show more than one possibility—or honestly say it could not make a reliable call.</p><p class="mt-4 leading-7 text-slate-600">The 75% number is a calibration target across a population of in-distribution images, not a promise for this single photo.</p><a href="{{ url_for('analyze') }}" class="mt-7 inline-flex items-center font-bold text-leaf-700 hover:underline">Start with a photo <span class="ml-2" aria-hidden="true">↗</span></a></div>
+            <div class="grid gap-4 sm:grid-cols-2"><div class="rounded-3xl border border-leaf-100 bg-leaf-50 p-6"><span class="text-3xl" aria-hidden="true">◌</span><h3 class="mt-5 font-display text-xl font-bold text-leaf-900">It can be unsure</h3><p class="mt-2 text-sm leading-6 text-slate-600">An empty result is not “no disease” and not “healthy.” It means the image needs a clearer look or expert review.</p></div><div class="rounded-3xl border border-[#f0dfd6] bg-[#fff7f2] p-6"><span class="text-3xl" aria-hidden="true">⌁</span><h3 class="mt-5 font-display text-xl font-bold text-leaf-900">It is a starting point</h3><p class="mt-2 text-sm leading-6 text-slate-600">Leaf symptoms can overlap. Use the library and ask an agricultural expert before treatment decisions.</p></div></div>
+        </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-6 rounded-[2rem] border border-leaf-100 bg-white p-6 shadow-sm sm:p-8 lg:flex-row lg:items-center lg:justify-between"><div><p class="text-sm font-extrabold uppercase tracking-[.18em] text-leaf-600">Project snapshot</p><h2 class="mt-2 font-display text-2xl font-bold text-leaf-900">A calibrated model with an honest readout.</h2></div><div class="grid grid-cols-2 gap-3 sm:grid-cols-3"><div class="rounded-2xl bg-leaf-50 px-5 py-4"><p class="text-2xl font-extrabold text-leaf-700">{{ '%.0f'|format(target_coverage) if target_coverage is not none else '—' }}%</p><p class="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">target coverage</p></div><div class="rounded-2xl bg-slate-50 px-5 py-4"><p class="text-2xl font-extrabold text-leaf-700">{{ '%.2f'|format(empirical_coverage) if empirical_coverage is not none else '—' }}%</p><p class="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">latest audit</p></div><div class="col-span-2 rounded-2xl bg-slate-50 px-5 py-4 sm:col-span-1"><p class="text-2xl font-extrabold text-leaf-700">{{ evaluation_sample_count or '—' }}</p><p class="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">test images</p></div></div></div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div class="mb-6 flex items-end justify-between gap-4"><div><p class="text-sm font-extrabold uppercase tracking-[.18em] text-leaf-600">What it covers</p><h2 class="mt-2 font-display text-3xl font-bold text-leaf-900">Ten reference conditions</h2></div><a href="{{ url_for('disease_library') }}" class="hidden text-sm font-bold text-leaf-700 hover:underline sm:inline">Open library →</a></div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {% for disease in diseases %}<a href="{{ url_for('disease_detail', slug=disease.slug) }}" class="group rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-leaf-300 hover:shadow-lg"><div class="flex items-center justify-between gap-3"><span class="flex h-9 w-9 items-center justify-center rounded-xl {{ 'bg-[#fff0e8] text-clay' if disease.type == 'fungal' else 'bg-leaf-50 text-leaf-700' }}" aria-hidden="true">{{ '◒' if disease.type == 'fungal' else '✦' }}</span><span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">{{ disease.type }}</span></div><h3 class="mt-4 text-sm font-extrabold leading-5 text-slate-800 group-hover:text-leaf-700">{{ disease.name }}</h3></a>{% endfor %}
+        </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8"><div class="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-5 text-sm leading-7 text-amber-950"><strong>Important:</strong> This tool is for tomato leaves only and is not a diagnosis. Only upload photos of tomato leaves. Confirm with an agricultural expert before treatment decisions.</div></section>
+</div>
+{% endblock %}
