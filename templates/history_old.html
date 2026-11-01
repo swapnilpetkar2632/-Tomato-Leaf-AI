@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Scan history · Tomato Leaf AI{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <p class="text-sm font-bold uppercase tracking-widest text-leaf-600">Your account</p>
+            <h1 class="mt-2 text-3xl font-extrabold text-slate-900">Scan history</h1>
+            <p class="mt-2 text-slate-600">Your saved results are private to this account.</p>
+        </div>
+        {% if scans %}
+        <form method="post" action="{{ url_for('auth.clear_history') }}" onsubmit="return confirm('Clear all saved scans?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">Clear all history</button>
+        </form>
+        {% endif %}
+    </div>
+    {% if scans %}
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {% for scan in scans %}
+            <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="flex h-48 items-center justify-center bg-leaf-50">
+                    {% if scan.thumbnail_path %}<img src="{{ url_for('auth.scan_thumbnail', scan_id=scan.id) }}" alt="Saved tomato leaf scan" class="h-full w-full object-cover">{% else %}<span class="text-5xl" aria-hidden="true">🍃</span>{% endif %}
+                </div>
+                <div class="p-5">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-slate-900">{{ scan.top_disease }}</h2>
+                            <p class="mt-1 text-xs text-slate-500">{{ scan.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+                        </div>
+                        <span class="rounded-full bg-leaf-50 px-2.5 py-1 text-xs font-bold text-leaf-700">{{ '%.2f'|format(scan.top_confidence * 100) }}%</span>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-600">Prediction set: {{ scan.prediction_set|join(', ') if scan.prediction_set else 'Empty set' }}</p>
+                    <p class="mt-1 text-xs text-slate-500">{{ scan.set_size }} candidate class{{ '' if scan.set_size == 1 else 'es' }}</p>
+                    <form method="post" action="{{ url_for('auth.delete_scan', scan_id=scan.id) }}" class="mt-5">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="text-sm font-bold text-red-700 hover:underline">Delete scan</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="rounded-2xl border border-dashed border-leaf-200 bg-leaf-50 px-6 py-16 text-center">
+            <div class="text-5xl" aria-hidden="true">📷</div>
+            <h2 class="mt-4 text-xl font-extrabold text-slate-900">No saved scans yet</h2>
+            <p class="mt-2 text-slate-600">Analyze an image and choose “Save to history” to see it here.</p>
+            <a href="{{ url_for('index') }}" class="mt-6 inline-flex rounded-xl bg-leaf-500 px-5 py-3 font-bold text-white hover:bg-leaf-600">Diagnose an image</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

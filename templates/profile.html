@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Profile · Tomato Leaf AI{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="mb-8"><p class="text-sm font-bold uppercase tracking-widest text-leaf-600">Account settings</p><h1 class="mt-2 text-3xl font-extrabold text-slate-900">Your profile</h1></div>
+    <div class="grid gap-6 lg:grid-cols-2">
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 class="text-xl font-extrabold text-slate-900">Profile details</h2>
+            <form method="post" class="mt-6 space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="profile">
+                <div><label for="name" class="mb-2 block text-sm font-semibold text-slate-700">Name</label><input id="name" name="name" required value="{{ current_user.name }}" class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-200"></div>
+                <div><label for="email" class="mb-2 block text-sm font-semibold text-slate-700">Email</label><input id="email" value="{{ current_user.email }}" disabled class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500"></div>
+                <div><label for="language" class="mb-2 block text-sm font-semibold text-slate-700">Language preference</label><select id="language" name="language" class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-200">{% for language in languages %}<option value="{{ language }}" {% if current_user.language == language %}selected{% endif %}>{{ language|upper }}</option>{% endfor %}</select></div>
+                <button class="rounded-xl bg-leaf-500 px-5 py-3 font-bold text-white hover:bg-leaf-600">Save profile</button>
+            </form>
+        </section>
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 class="text-xl font-extrabold text-slate-900">Change password</h2>
+            <form method="post" class="mt-6 space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="password">
+                <div><label for="current_password" class="mb-2 block text-sm font-semibold text-slate-700">Current password</label><input id="current_password" name="current_password" type="password" autocomplete="current-password" required class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-200"></div>
+                <div><label for="new_password" class="mb-2 block text-sm font-semibold text-slate-700">New password</label><input id="new_password" name="new_password" type="password" autocomplete="new-password" required class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-200"></div>
+                <div><label for="confirm_password" class="mb-2 block text-sm font-semibold text-slate-700">Confirm new password</label><input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-200"></div>
+                <button class="rounded-xl bg-leaf-500 px-5 py-3 font-bold text-white hover:bg-leaf-600">Change password</button>
+            </form>
+        </section>
+    </div>
+    <section class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-6 sm:p-8">
+        <h2 class="text-xl font-extrabold text-red-900">Delete account</h2>
+        <p class="mt-2 text-sm leading-6 text-red-800">This permanently deletes your account and saved scan history.</p>
+        <form method="post" class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="delete">
+            <div><label for="confirmation" class="mb-2 block text-sm font-semibold text-red-900">Type DELETE to confirm</label><input id="confirmation" name="confirmation" required class="rounded-xl border border-red-300 bg-white px-4 py-3 focus:border-red-500 focus:ring-2 focus:ring-red-200"></div>
+            <button class="rounded-xl bg-red-700 px-5 py-3 font-bold text-white hover:bg-red-800">Delete account</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

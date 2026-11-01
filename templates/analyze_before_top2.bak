@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Analyze a leaf · Tomato Leaf AI{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p class="text-sm font-extrabold uppercase tracking-[.18em] text-leaf-600">Leaf analysis</p><h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-leaf-900 sm:text-4xl">What do you notice on this leaf?</h1><p class="mt-3 max-w-2xl leading-7 text-slate-600">Use one clear photo. The model will return a possible disease or explain when it cannot make a reliable call.</p></div><span class="inline-flex w-fit items-center gap-2 rounded-full border border-leaf-200 bg-white px-3 py-2 text-xs font-extrabold uppercase tracking-wider text-leaf-700"><span class="h-2 w-2 rounded-full bg-leaf-500" aria-hidden="true"></span> 16 MB maximum</span></div>
+
+    <div class="grid gap-6 xl:grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)]">
+        <section class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft sm:p-7" aria-labelledby="upload-title">
+            <div class="flex items-start justify-between gap-4"><div><p class="text-xs font-extrabold uppercase tracking-[.18em] text-clay">Step 1</p><h2 id="upload-title" class="mt-2 font-display text-2xl font-bold text-leaf-900">Add a photo</h2></div><span class="rounded-full bg-leaf-50 px-3 py-1.5 text-xs font-bold text-leaf-700">JPG · PNG · WebP · BMP · TIFF</span></div>
+            <div id="dropzone" class="mt-6 flex min-h-72 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-leaf-200 bg-leaf-50/60 px-6 text-center transition hover:border-leaf-500 hover:bg-leaf-50" tabindex="0" role="button" aria-labelledby="dropzone-title" aria-describedby="dropzone-help">
+                <span class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-4xl shadow-sm" aria-hidden="true">⌁</span><h3 id="dropzone-title" class="mt-5 text-lg font-extrabold text-slate-800">Drag and drop a leaf photo</h3><p id="dropzone-help" class="mt-2 max-w-sm text-sm leading-6 text-slate-500">Or use the buttons below. Include one leaf, in focus, with enough daylight to see its surface.</p>
+                <input id="file-input" type="file" accept=".jpg,.jpeg,.png,.webp,.bmp,.tif,.tiff,image/*" class="sr-only" aria-label="Choose a tomato leaf image">
+                <input id="camera-input" type="file" accept="image/*" capture="environment" class="sr-only" aria-label="Take a tomato leaf photo">
+            </div>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2"><button id="browse-button" type="button" class="rounded-xl border border-leaf-200 bg-white px-4 py-3 text-sm font-extrabold text-leaf-700 hover:bg-leaf-50">Choose from device</button><button id="camera-button" type="button" class="rounded-xl border border-leaf-200 bg-white px-4 py-3 text-sm font-extrabold text-leaf-700 hover:bg-leaf-50">Take a photo</button></div>
+            <div id="upload-error" class="mt-4 hidden rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800" role="alert"></div>
+            <div id="preview-container" class="mt-6 hidden overflow-hidden rounded-3xl border border-leaf-100 bg-leaf-50 p-3"><img id="image-preview" src="#" alt="Selected tomato leaf preview" class="max-h-[22rem] w-full rounded-2xl object-contain"><div class="mt-3 flex items-center justify-between gap-3"><span id="file-name" class="truncate text-sm font-bold text-slate-700"></span><button id="change-button" type="button" class="shrink-0 text-sm font-extrabold text-leaf-700 hover:underline">Change image</button></div></div>
+            <button id="predict-button" type="button" disabled class="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-leaf-700 px-5 py-4 font-extrabold text-white shadow-lg shadow-leaf-200 transition hover:bg-leaf-900 disabled:cursor-not-allowed disabled:opacity-50"><span id="predict-spinner" class="hidden h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true"></span><span id="predict-label">Analyze leaf</span></button>
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4"><h3 class="text-sm font-extrabold text-slate-800">Photo tips</h3><ul class="mt-3 grid gap-2 text-sm leading-6 text-slate-600 sm:grid-cols-2"><li><span class="mr-2 text-leaf-700" aria-hidden="true">✓</span>One leaf, not a whole field</li><li><span class="mr-2 text-leaf-700" aria-hidden="true">✓</span>Good daylight</li><li><span class="mr-2 text-leaf-700" aria-hidden="true">✓</span>Plain background</li><li><span class="mr-2 text-leaf-700" aria-hidden="true">✓</span>Keep the camera steady</li></ul></div>
+        </section>
+
+        <section class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft sm:p-7" aria-labelledby="result-title"><div class="flex items-start justify-between gap-4"><div><p class="text-xs font-extrabold uppercase tracking-[.18em] text-clay">Step 2</p><h2 id="result-title" class="mt-2 font-display text-2xl font-bold text-leaf-900">Your readout</h2></div><span class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600">Target {{ '%.0f'|format(target_coverage) if target_coverage is not none else '75' }}%</span></div><div id="results-content" class="mt-6" aria-live="polite" aria-atomic="true"><div class="flex min-h-[28rem] flex-col items-center justify-center rounded-3xl bg-slate-50 px-6 text-center text-slate-500"><span class="text-6xl" aria-hidden="true">◌</span><p class="mt-5 font-display text-xl font-bold text-slate-700">Your possible matches will appear here</p><p class="mt-2 max-w-sm text-sm leading-6">Start with a clear photo of a single tomato leaf.</p></div></div></section>
+    </div>
+    <div class="mt-6 grid gap-4 lg:grid-cols-2"><div class="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"><strong>Use this carefully:</strong> the 75% value is a calibration target across images, not a guarantee for this one leaf.</div><div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm leading-6 text-slate-600"><strong class="text-slate-800">Photo scope:</strong> Only upload photos of tomato leaves. This screen is not a reliable detector for other objects or diseases.</div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    const diseaseMap = {{ disease_map|tojson }};
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const maxBytes = 16 * 1024 * 1024;
+    const allowedExtensions = new Set(['jpg', 'jpeg', 'png', 'webp', 'bmp', 'tif', 'tiff']);
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const cameraInput = document.getElementById('camera-input');
+    const previewContainer = document.getElementById('preview-container');
+    const imagePreview = document.getElementById('image-preview');
+    const fileName = document.getElementById('file-name');
+    const uploadError = document.getElementById('upload-error');
+    const predictButton = document.getElementById('predict-button');
+    const predictSpinner = document.getElementById('predict-spinner');
+    const predictLabel = document.getElementById('predict-label');
+    const resultsContent = document.getElementById('results-content');
+    let selectedFile = null;
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>'"]/g, character => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[character]));
+    }
+
+    function slugify(value) {
+        return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    function showUploadError(message) { uploadError.textContent = message; uploadError.classList.remove('hidden'); }
+    function clearUploadError() { uploadError.textContent = ''; uploadError.classList.add('hidden'); }
+
+    function validateFile(file) {
+        if (!file) return 'Choose an image to continue.';
+        const extension = (file.name.split('.').pop() || '').toLowerCase();
+        if (!allowedExtensions.has(extension)) return 'Use a JPG, PNG, WebP, BMP or TIFF image.';
+        if (file.size > maxBytes) return 'This image is larger than 16 MB. Please choose a smaller file.';
+        return '';
+    }
+
+    function handleFile(file) {
+        const error = validateFile(file);
+        if (error) { showUploadError(error); return; }
+        clearUploadError();
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = event => { imagePreview.src = event.target.result; fileName.textContent = file.name; dropzone.classList.add('hidden'); previewContainer.classList.remove('hidden'); predictButton.disabled = false; };
+        reader.readAsDataURL(file);
+    }
+
+    function resetAnalysis() {
+        selectedFile = null; fileInput.value = ''; cameraInput.value = ''; imagePreview.src = '#'; fileName.textContent = ''; previewContainer.classList.add('hidden'); dropzone.classList.remove('hidden'); predictButton.disabled = true; clearUploadError();
+        resultsContent.innerHTML = '<div class="flex min-h-[28rem] flex-col items-center justify-center rounded-3xl bg-slate-50 px-6 text-center text-slate-500"><span class="text-6xl" aria-hidden="true">◌</span><p class="mt-5 font-display text-xl font-bold text-slate-700">Your possible matches will appear here</p><p class="mt-2 max-w-sm text-sm leading-6">Start with a clear photo of a single tomato leaf.</p></div>';
+    }
+
+    function setLoading(loading) {
+        predictButton.disabled = loading || !selectedFile; predictSpinner.classList.toggle('hidden', !loading); predictLabel.textContent = loading ? 'Analyzing leaf...' : 'Analyze leaf';
+    }
+
+    function diseaseInfo(label) {
+        return diseaseMap[label] || diseaseMap[String(label || '').toLowerCase()] || { slug: slugify(label), summary: 'Review this possibility in the disease library.', symptom_snapshot: 'Compare the full symptoms with the plant in front of you.' };
+    }
+
+    function resultLink(label, text) {
+        const info = diseaseInfo(label);
+        return `<a href="/diseases/${encodeURIComponent(info.slug)}" class="font-extrabold text-leaf-700 hover:underline">${escapeHtml(text || label)}</a>`;
+    }
+
+    function renderComparison(names) {
+        if (names.length < 2) return '';
+        const cards = names.slice(0, 3).map(name => { const info = diseaseInfo(name); return `<div class="rounded-2xl border border-amber-200 bg-white p-4"><h4 class="font-bold text-slate-800">${resultLink(name, name)}</h4><p class="mt-2 text-sm leading-6 text-slate-600">${escapeHtml(info.symptom_snapshot)}</p></div>`; }).join('');
+        return `<div class="mt-5"><h4 class="text-sm font-extrabold uppercase tracking-wider text-amber-900">Quick symptom comparison</h4><div class="mt-3 grid gap-3 sm:grid-cols-2">${cards}</div></div>`;
+    }
+
+    function renderResults(data) {
+        const names = Array.isArray(data.prediction_set) ? data.prediction_set : [];
+        const emptySet = data.prediction_set_status === 'empty' || names.length === 0;
+        const lowConfidenceThreshold = 75;
+        const lowConfidence = Number(data.top_confidence_percentage) < lowConfidenceThreshold;
+        let resultCard;
+        if (emptySet) {
+            resultCard = `<div class="rounded-3xl border border-slate-200 bg-slate-100 p-6"><div class="flex items-start gap-4"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-xl text-slate-500" aria-hidden="true">?</span><div><p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">No reliable match</p><h3 class="mt-2 font-display text-2xl font-bold text-slate-900">The system couldn't make a reliable call.</h3><p class="mt-3 text-sm leading-6 text-slate-700">Please try a clearer photo. This does not mean “no disease” or “healthy.”</p></div></div></div>`;
+        } else if (names.length === 1) {
+            const name = names[0];
+            resultCard = `<div class="rounded-3xl border border-leaf-200 bg-leaf-50 p-6"><p class="text-xs font-extrabold uppercase tracking-wider text-leaf-700">One possible match</p><h3 class="mt-2 font-display text-3xl font-bold text-leaf-900">Likely: ${resultLink(name, name)}</h3><div class="mt-5 flex items-center justify-between text-sm font-bold text-slate-700"><span>Model confidence</span><span>${Number(data.top_confidence_percentage).toFixed(2)}%</span></div><div class="mt-2 h-3 overflow-hidden rounded-full bg-white"><div class="h-full rounded-full bg-leaf-700" style="width:${Math.min(100, Math.max(0, Number(data.top_confidence_percentage)))}%"></div></div><p class="mt-4 text-sm leading-6 text-slate-700">A model-assisted suggestion for this image. Compare it with the plant and library details.</p></div>`;
+        } else {
+            resultCard = `<div class="rounded-3xl border border-amber-200 bg-amber-50 p-6"><p class="text-xs font-extrabold uppercase tracking-wider text-amber-800">Several possibilities</p><h3 class="mt-2 font-display text-3xl font-bold text-leaf-900">Could be: ${names.slice(0, 3).map(name => resultLink(name, name)).join(' <span class="text-amber-700">or</span> ')}</h3><p class="mt-4 text-sm leading-6 text-slate-700">The image shares patterns with more than one class. Use the comparison below and seek expert confirmation before treatment.</p>${renderComparison(names)}</div>`;
+        }
+        const reviewTip = lowConfidence ? '<div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"><strong>Try a clearer photo:</strong> top confidence is below 75%. Please upload a clear, well-lit image showing a single tomato leaf.</div>' : '';
+        const leafNote = data.leaf_screen_passed ? '' : '<div class="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-900"><strong>Photo scope:</strong> Only upload photos of tomato leaves.</div>';
+        const confidenceRows = (data.confidences || []).map(item => `<div><div class="mb-1 flex justify-between gap-3 text-sm"><span class="font-semibold text-slate-700">${escapeHtml(item.class_name)} ${item.in_set ? '<span class="text-leaf-700">· possible</span>' : ''}</span><span class="font-bold text-slate-600">${Number(item.percentage).toFixed(2)}%</span></div><div class="h-2 overflow-hidden rounded-full bg-slate-100"><div class="h-full rounded-full bg-gradient-to-r from-leaf-700 to-leaf-300" style="width:${Math.min(100, Math.max(0, Number(item.percentage)))}%"></div></div></div>`).join('');
+        const topLink = emptySet ? '' : `<a href="/diseases/${encodeURIComponent(diseaseInfo(data.top_disease).slug)}" class="mt-5 inline-flex items-center rounded-xl border border-leaf-200 bg-white px-4 py-2.5 text-sm font-extrabold text-leaf-700 hover:bg-leaf-50">Learn more about this disease <span class="ml-2" aria-hidden="true">↗</span></a>`;
+        resultsContent.innerHTML = `${resultCard}${reviewTip}${leafNote}${topLink}<details class="mt-6 rounded-2xl border border-slate-200 bg-white"><summary class="flex items-center justify-between gap-4 px-4 py-4 text-sm font-extrabold text-slate-800"><span>See all class probabilities</span><span aria-hidden="true">⌄</span></summary><div class="space-y-4 border-t border-slate-100 px-4 py-4">${confidenceRows}</div></details><div id="save-status" class="mt-4 text-sm font-bold text-leaf-700" role="status" aria-live="polite">Saving this analysis to your history...</div><div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600"><strong class="text-slate-800">Remember:</strong> AI-assisted suggestion. Confirm with an agricultural expert before treatment decisions.</div><button id="another-button" type="button" class="mt-5 w-full rounded-xl border border-leaf-200 bg-white px-4 py-3 font-extrabold text-leaf-700 hover:bg-leaf-50">Analyze another leaf</button>`;
+        document.getElementById('another-button').addEventListener('click', resetAnalysis);
+    }
+
+    async function saveToHistory(result) {
+        const status = document.getElementById('save-status');
+        const formData = new FormData(); formData.append('image', selectedFile); formData.append('result', JSON.stringify(result));
+        try {
+            const response = await fetch('/api/history/save', { method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: formData });
+            const data = await response.json().catch(() => ({}));
+            if (response.status === 401) { window.location.href = `/login?next=${encodeURIComponent('/analyze')}`; return; }
+            if (!response.ok || !data.success) throw new Error('');
+            status.textContent = 'Saved to history.';
+        } catch (_error) { status.textContent = 'The analysis is shown, but it could not be saved to history.'; status.className = 'mt-4 text-sm font-bold text-amber-700'; }
+    }
+
+    async function submitPrediction() {
+        if (!selectedFile) return;
+        setLoading(true);
+        const formData = new FormData(); formData.append('image', selectedFile);
+        try {
+            const response = await fetch('/api/predict', { method: 'POST', body: formData });
+            const data = await response.json().catch(() => ({}));
+            if (response.status === 401) { window.location.href = `/login?next=${encodeURIComponent('/analyze')}`; return; }
+            if (!response.ok || !data.success) throw new Error('The image could not be analyzed. Please try another clear photo.');
+            renderResults(data); await saveToHistory(data);
+        } catch (_error) { resultsContent.innerHTML = '<div class="rounded-3xl border border-red-200 bg-red-50 px-5 py-5 text-sm font-semibold leading-6 text-red-800" role="alert">The image could not be analyzed. Please try another clear photo.</div>'; }
+        finally { setLoading(false); }
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click()); dropzone.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); } });
+    ['dragenter', 'dragover'].forEach(name => dropzone.addEventListener(name, event => { event.preventDefault(); dropzone.classList.add('border-leaf-500', 'bg-leaf-100'); }));
+    ['dragleave', 'drop'].forEach(name => dropzone.addEventListener(name, event => { event.preventDefault(); dropzone.classList.remove('border-leaf-500', 'bg-leaf-100'); }));
+    dropzone.addEventListener('drop', event => handleFile(event.dataTransfer.files[0])); fileInput.addEventListener('change', event => handleFile(event.target.files[0])); cameraInput.addEventListener('change', event => handleFile(event.target.files[0]));
+    document.getElementById('browse-button').addEventListener('click', () => fileInput.click()); document.getElementById('camera-button').addEventListener('click', () => cameraInput.click()); document.getElementById('change-button').addEventListener('click', resetAnalysis); predictButton.addEventListener('click', submitPrediction);
+</script>
+{% endblock %}

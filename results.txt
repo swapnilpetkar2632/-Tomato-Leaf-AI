@@ -1,0 +1,34 @@
+======================================================================
+  CONFORMAL PREDICTION EVALUATION RESULTS
+======================================================================
+Total Test Images      : 500
+Target Coverage        : 75.00%
+Empirical Coverage     : 77.80% (389/500)
+Coverage Difference    : +2.80% vs target
+Average Set Size       : 0.78 classes
+----------------------------------------------------------------------
+
+Set Size Distribution:
+Set Size   | Count      | Percentage
+-----------------------------------
+0          | 111        |     22.20%
+1          | 389        |     77.80%
+2          | 0          |      0.00%
+3          | 0          |      0.00%
+4+         | 0          |      0.00%
+
+----------------------------------------------------------------------
+Per-Class Empirical Coverage Breakdown:
+Class Name                       |   Test Count |      Covered |     Coverage
+----------------------------------------------------------------------
+Tomato_Bacterial_spot            |           50 |           40 |        80.00%
+Tomato_Early_blight              |           50 |           26 |        52.00%
+Tomato_Late_blight               |           50 |           39 |        78.00%
+Tomato_Leaf_Mold                 |           50 |           39 |        78.00%
+Tomato_Septoria_leaf_spot        |           50 |           43 |        86.00%
+Tomato_Spider_mites              |           50 |           36 |        72.00%
+Tomato_Target_Spot               |           50 |           30 |        60.00%
+Tomato_Yellow_Leaf_Curl_Virus    |           50 |           47 |        94.00%
+Tomato_healthy                   |           50 |           50 |       100.00%
+Tomato_mosaic_virus              |           50 |           39 |        78.00%
+======================================================================

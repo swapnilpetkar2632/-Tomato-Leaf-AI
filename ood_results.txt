@@ -1,0 +1,17 @@
+======================================================================
+  EXPLORATORY OOD BEHAVIOR AUDIT
+======================================================================
+Source Directory       : D:\ood
+Images Audited         : 102
+Top Score Mean         : 0.8509
+Top Score Minimum      : 0.2956
+Top Score Maximum      : 1.0000
+20% Heuristic Passed   : 102/102 (100.00%)
+Empty Prediction Sets  : 72/102 (70.59%)
+Set Size Distribution:
+  0: 72
+  1: 30
+----------------------------------------------------------------------
+This is an exploratory audit of softmax and conformal-set behavior.
+It does not validate OOD detection and does not provide coverage guarantees.
+======================================================================

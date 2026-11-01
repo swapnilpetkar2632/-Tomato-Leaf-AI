@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomato Leaf Disease Prediction & Conformal Uncertainty</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f0f7ff;
+            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 40%, #eef2ff 100%);
+            --card-bg: #ffffff;
+            --card-border: #dbeafe;
+            --card-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.08), 0 8px 10px -6px rgba(37, 99, 235, 0.04);
+            
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --primary-border: #bfdbfe;
+            
+            --accent-green: #059669;
+            --accent-green-bg: #ecfdf5;
+            --accent-green-border: #a7f3d0;
+            
+            --accent-warning: #dc2626;
+            --accent-warning-bg: #fef2f2;
+            --accent-warning-border: #fca5a5;
+
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-light: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+        }
+
+        .badge-coverage {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary-light);
+            border: 1px solid var(--primary-border);
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.45rem 1.1rem;
+            border-radius: 9999px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Dropzone Styling */
+        .dropzone {
+            border: 2px dashed #93c5fd;
+            border-radius: 1rem;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 240px;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .dropzone svg {
+            width: 52px;
+            height: 52px;
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 1.8;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dropzone:hover svg {
+            transform: translateY(-4px);
+        }
+
+        .dropzone p {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .dropzone span {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Preview Container (Replaces Dropzone smoothly when file is uploaded) */
+        .preview-container {
+            display: none;
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            background: #f8fafc;
+            position: relative;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .preview-image-wrapper {
+            position: relative;
+            max-height: 260px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e2e8f0;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            display: block;
+            border-radius: 0.5rem;
+        }
+
+        .preview-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.85rem;
+            padding: 0 0.25rem;
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+
+        .change-btn {
+            background: #ffffff;
+            border: 1px solid var(--primary-border);
+            color: var(--primary);
+            padding: 0.4rem 0.85rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .change-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        /* Button Styling */
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 0.95rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+        }
+
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .placeholder-results {
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .result-box-neutral {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-border);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .result-box-warning {
+            background: var(--accent-warning-bg);
+            border: 1px solid var(--accent-warning-border);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .result-box-alert {
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            color: #9a3412;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .status-illustration {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 0.7rem;
+            display: block;
+        }
+
+        .conf-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .conf-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .conf-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .conf-name {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .conf-val {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .bar-bg {
+            height: 9px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            border-radius: 999px;
+            transition: width 0.6s ease;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="badge-coverage">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            Calibrated target: {% if target_coverage is not none %}{{ "%.0f"|format(target_coverage) }}%{% else %}unavailable{% endif %}
+        </div>
+        <h1>Tomato Leaf Disease Detector</h1>
+        <p>
+            Split conformal targets marginal in-distribution coverage under exchangeability assumptions; it does not guarantee an individual result or cover arbitrary out-of-distribution images.
+            {% if empirical_coverage is not none %}
+            Last recorded evaluation: {{ "%.2f"|format(empirical_coverage) }}% on {{ evaluation_sample_count }} test images.
+            {% else %}
+            No test evaluation result is available yet.
+            {% endif %}
+        </p>
+    </header>
+
+    <div class="container">
+        <!-- Upload Card -->
+        <div class="card">
+            <h2 class="card-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                1. Select or Upload Image
+            </h2>
+            
+            <!-- Upload Box (Initial state) -->
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path></svg>
+                <p>Drag & Drop your leaf image here</p>
+                <span>or click to browse JPG / PNG files</span>
+                <input type="file" id="file-input" accept="image/*">
+            </div>
+
+            <!-- Preview Box (Replaces Dropzone after upload) -->
+            <div class="preview-container" id="preview-container">
+                <div class="preview-image-wrapper">
+                    <img id="image-preview" src="#" alt="Leaf Preview">
+                </div>
+                <div class="preview-meta">
+                    <span class="file-name" id="file-name">leaf_image.jpg</span>
+                    <button class="change-btn" id="change-img-btn" onclick="resetUpload()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                        Change Photo
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn" id="predict-btn" disabled onclick="submitPrediction()">
+                <span>Analyze Leaf Image</span>
+            </button>
+        </div>
+
+        <!-- Results Card -->
+        <div class="card">
+            <h2 class="card-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                2. Prediction Results
+            </h2>
+
+            <div id="results-content" class="results-panel">
+                <div class="placeholder-results">
+                    <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; stroke: #93c5fd;"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><circle cx="10" cy="13" r="2"></circle><path d="m20 17-1.09-1.09a2 2 0 0 0-2.82 0L10 22"></path></svg>
+                    <p style="font-weight: 500; font-size: 1.05rem;">No image analyzed yet</p>
+                    <p style="font-size: 0.875rem; margin-top: 0.3rem;">Upload a leaf photo on the left to see instant diagnostic results.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const fileNameDisplay = document.getElementById('file-name');
+        const predictBtn = document.getElementById('predict-btn');
+        const resultsContent = document.getElementById('results-content');
+
+        let selectedFile = null;
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            if (dt.files && dt.files[0]) {
+                handleFile(dt.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                fileNameDisplay.textContent = file.name;
+                
+                // HIDE the dropzone box and SHOW the preview container
+                dropzone.style.display = 'none';
+                previewContainer.style.display = 'block';
+                predictBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetUpload() {
+            selectedFile = null;
+            fileInput.value = '';
+            
+            // HIDE preview container and SHOW the dropzone box again
+            previewContainer.style.display = 'none';
+            dropzone.style.display = 'flex';
+            predictBtn.disabled = true;
+
+            // Reset results panel
+            resultsContent.innerHTML = `
+                <div class="placeholder-results">
+                    <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; stroke: #93c5fd;"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><circle cx="10" cy="13" r="2"></circle><path d="m20 17-1.09-1.09a2 2 0 0 0-2.82 0L10 22"></path></svg>
+                    <p style="font-weight: 500; font-size: 1.05rem;">No image analyzed yet</p>
+                    <p style="font-size: 0.875rem; margin-top: 0.3rem;">Upload a leaf photo on the left to see instant diagnostic results.</p>
+                </div>
+            `;
+        }
+
+        async function submitPrediction() {
+            if (!selectedFile) return;
+
+            predictBtn.disabled = true;
+            predictBtn.innerHTML = '<span class="spinner"></span> <span>Analyzing Leaf...</span>';
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (response.ok && data.success) {
+                    renderResults(data);
+                } else {
+                    const message = data.error || `Backend returned HTTP ${response.status}.`;
+                    resultsContent.innerHTML = `<div style="color: #dc2626; background: #fef2f2; border: 1px solid #fca5a5; padding: 1rem; border-radius: 0.75rem; text-align: center;">Error: ${message}</div>`;
+                }
+            } catch (err) {
+                resultsContent.innerHTML = `<div style="color: #dc2626; background: #fef2f2; border: 1px solid #fca5a5; padding: 1rem; border-radius: 0.75rem; text-align: center;">Failed to connect to backend server.</div>`;
+            } finally {
+                predictBtn.disabled = false;
+                predictBtn.innerText = 'Analyze Leaf Image';
+            }
+        }
+
+        function renderResults(data) {
+            const emptySet = data.prediction_set_status === 'empty';
+            const lowConfidenceThreshold = 75;
+            const lowSignal = Number(data.top_confidence_percentage) < lowConfidenceThreshold;
+            const warningState = emptySet || lowSignal;
+            const screenMessage = data.leaf_screen_passed
+                ? 'The top softmax score passed the 20% heuristic screen.'
+                : 'The top softmax score fell below the 20% heuristic screen.';
+            const statusLabel = emptySet
+                ? 'No classes met the calibrated threshold'
+                : lowSignal
+                    ? 'Low-confidence image signal'
+                    : `${data.set_size} candidate class${data.set_size === 1 ? '' : 'es'}`;
+            const statusTitle = lowSignal ? 'Please review this image' : data.top_disease;
+            const statusGuidance = lowSignal
+                ? `Top confidence is below ${lowConfidenceThreshold}%. Please upload a clear, well-lit image showing a single tomato leaf. ${screenMessage} This is a review warning, not a validated OOD detector.`
+                : `${screenMessage} This heuristic is not a validated detector of tomato leaves or out-of-distribution images.`;
+            const statusCardHtml = `
+                <div class="${warningState ? (lowSignal ? 'result-box-alert' : 'result-box-warning') : 'result-box-neutral'}">
+                    ${lowSignal ? `
+                        <svg class="status-illustration" viewBox="0 0 64 64" fill="none" aria-label="Low confidence warning" role="img">
+                            <circle cx="32" cy="32" r="27" fill="#ffedd5" stroke="#f97316" stroke-width="3"></circle>
+                            <path d="M32 18v20" stroke="#c2410c" stroke-width="5" stroke-linecap="round"></path>
+                            <circle cx="32" cy="47" r="3" fill="#c2410c"></circle>
+                        </svg>
+                    ` : ''}
+                    <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.3rem;">
+                        ${statusLabel}
+                    </div>
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.3rem;">${statusTitle}</div>
+                    <div style="font-size: 0.95rem; font-weight: 600;">Top softmax score: ${data.top_confidence_percentage}%</div>
+                    <div style="font-size: 0.85rem; line-height: 1.4; margin-top: 0.6rem;">
+                        ${statusGuidance}
+                    </div>
+                </div>
+            `;
+
+            let setTagsHtml = data.prediction_set.map(cls => `
+                <span style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-weight: 700; padding: 0.4rem 0.85rem; border-radius: 0.5rem; font-size: 0.9rem; display: inline-block;">
+                    ${cls}
+                </span>
+            `).join(' ');
+            if (!setTagsHtml) {
+                setTagsHtml = '<span>No class satisfies the calibrated score threshold for this image.</span>';
+            }
+
+            let confHtml = data.confidences.map(c => `
+                <div class="conf-item">
+                    <div class="conf-meta">
+                        <span class="conf-name">${c.class_name} ${c.in_set ? '✨ (In candidate set)' : ''}</span>
+                        <span class="conf-val">${c.percentage}%</span>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${c.percentage}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            resultsContent.innerHTML = `
+                ${statusCardHtml}
+                
+                <div style="background: #f8fafc; border: 1px solid #dbeafe; border-radius: 0.875rem; padding: 1.1rem; margin-bottom: 1.25rem;">
+                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #1e3a8a; font-weight: 700; margin-bottom: 0.6rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Split-conformal candidate set</span>
+                        <span style="background: #dbeafe; color: #1e40af; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.78rem;">Set Size: ${data.set_size}</span>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.45rem;">
+                        ${setTagsHtml}
+                    </div>
+                </div>
+
+                <h3 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); font-weight: 600; margin-top: 0.5rem;">Softmax Confidences Breakdown</h3>
+                <div class="conf-list">
+                    ${confHtml}
+                </div>
+            `;
+        }
+
+
+    </script>
+</body>
+</html>

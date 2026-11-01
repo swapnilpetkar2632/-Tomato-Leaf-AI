@@ -1,0 +1,213 @@
+import json
+import re
+import unittest
+from io import BytesIO
+
+from PIL import Image
+from unittest.mock import patch
+
+from app import app
+from extensions import db
+from models import Scan, User
+
+
+class AuthFlows(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.email = "auth-test-user@example.test"
+        cls.password = "Correct-Horse-42"
+        cls._cleanup_user()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._cleanup_user()
+
+    @classmethod
+    def _cleanup_user(cls):
+        with app.app_context():
+            user = User.query.filter_by(email=cls.email).first()
+            if user:
+                Scan.query.filter_by(user_id=user.id).delete()
+                db.session.delete(user)
+            db.session.commit()
+
+    def setUp(self):
+        self._cleanup_user()
+
+    def token(self, client, path, ip):
+        response = client.get(path, environ_base={"REMOTE_ADDR": ip})
+        self.assertEqual(response.status_code, 200)
+        match = re.search(r'name="csrf_token" value="([^"]+)"', response.get_data(as_text=True))
+        self.assertIsNotNone(match)
+        return match.group(1)
+
+    def test_public_auth_pages_return_200(self):
+        client = app.test_client()
+        for index, path in enumerate(("/login", "/signup", "/forgot-password"), start=1):
+            response = client.get(path, environ_base={"REMOTE_ADDR": f"10.10.0.{index}"})
+            self.assertEqual(response.status_code, 200)
+
+    def test_signup_login_logout_flow_and_hashed_password(self):
+        client = app.test_client()
+        ip = "10.10.1.1"
+        token = self.token(client, "/signup", ip)
+        response = client.post(
+            "/signup",
+            data={
+                "csrf_token": token,
+                "name": "Auth Test User",
+                "email": self.email,
+                "password": self.password,
+                "confirm_password": self.password,
+            },
+            environ_base={"REMOTE_ADDR": ip},
+            follow_redirects=False,
+        )
+        self.assertEqual(response.status_code, 302)
+        with app.app_context():
+            user = User.query.filter_by(email=self.email).first()
+            self.assertIsNotNone(user)
+            self.assertNotEqual(user.password_hash, self.password)
+            self.assertTrue(user.check_password(self.password))
+
+        logout_token = self.token(client, "/", ip)
+        response = client.post(
+            "/logout",
+            data={"csrf_token": logout_token},
+            environ_base={"REMOTE_ADDR": ip},
+            follow_redirects=False,
+        )
+        self.assertEqual(response.status_code, 302)
+        login_token = self.token(client, "/login", ip)
+        response = client.post(
+            "/login",
+            data={"csrf_token": login_token, "email": self.email, "password": self.password},
+            environ_base={"REMOTE_ADDR": ip},
+            follow_redirects=False,
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_unknown_email_and_wrong_password_use_same_message(self):
+        with app.app_context():
+            user = User.query.filter_by(email=self.email).first()
+            if user is None:
+                user = User(name="Auth Test User", email=self.email)
+                user.set_password(self.password)
+                db.session.add(user)
+                db.session.commit()
+
+        responses = []
+        for index, email, password in (
+            (1, self.email, "wrong-password"),
+            (2, "unknown-user@example.test", "wrong-password"),
+        ):
+            client = app.test_client()
+            ip = f"10.10.2.{index}"
+            token = self.token(client, "/login", ip)
+            response = client.post(
+                "/login",
+                data={"csrf_token": token, "email": email, "password": password},
+                environ_base={"REMOTE_ADDR": ip},
+                follow_redirects=True,
+            )
+            responses.append(response.get_data(as_text=True))
+        self.assertEqual(responses[0].count("Email or password is incorrect."), 1)
+        self.assertEqual(responses[0].count("Email or password is incorrect."), responses[1].count("Email or password is incorrect."))
+
+    def test_repeated_failed_logins_are_rate_limited(self):
+        client = app.test_client()
+        ip = "10.10.3.1"
+        token = self.token(client, "/login", ip)
+        statuses = []
+        for _ in range(6):
+            response = client.post(
+                "/login",
+                data={"csrf_token": token, "email": "rate@example.test", "password": "wrong"},
+                environ_base={"REMOTE_ADDR": ip},
+            )
+            statuses.append(response.status_code)
+        self.assertIn(429, statuses)
+
+    def test_protected_pages_redirect_when_logged_out(self):
+        client = app.test_client()
+        for path in ("/history", "/profile"):
+            response = client.get(path, follow_redirects=False)
+            self.assertEqual(response.status_code, 302)
+            self.assertIn("/login", response.location)
+
+    def test_prediction_contract_works_without_login(self):
+        fake_result = {
+            "is_tomato_leaf": True,
+            "leaf_screen_passed": True,
+            "leaf_screen_threshold": 0.20,
+            "leaf_screen_validated": False,
+            "top_class": "Tomato_healthy",
+            "top_confidence": 0.91,
+            "is_confident": True,
+            "uncertainty_level": "LOW",
+            "prediction_set": ["Tomato_healthy"],
+            "prediction_set_status": "nonempty",
+            "confidences": {"Tomato_healthy": 0.91, "Tomato_Bacterial_spot": 0.09},
+            "set_size": 1,
+            "target_coverage": 0.75,
+        }
+        image = BytesIO()
+        Image.new("RGB", (16, 16), "green").save(image, format="PNG")
+        image.seek(0)
+        with patch("app.predict_with_uncertainty", return_value=fake_result):
+            response = app.test_client().post(
+                "/api/predict",
+                data={"image": (image, "leaf.png")},
+                content_type="multipart/form-data",
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            set(response.get_json()),
+            {
+                "success", "is_tomato_leaf", "leaf_screen_passed", "leaf_screen_threshold",
+                "leaf_screen_validated", "top_disease", "top_confidence_percentage",
+                "is_confident", "uncertainty_level", "prediction_set_status", "prediction_set",
+                "raw_prediction_set", "set_size", "confidences", "target_coverage",
+            },
+        )
+
+    def test_logged_in_user_can_save_and_view_history(self):
+        client = app.test_client()
+        ip = "10.10.4.1"
+        token = self.token(client, "/signup", ip)
+        client.post(
+            "/signup",
+            data={
+                "csrf_token": token,
+                "name": "Auth Test User",
+                "email": self.email,
+                "password": self.password,
+                "confirm_password": self.password,
+            },
+            environ_base={"REMOTE_ADDR": ip},
+        )
+        csrf_token = self.token(client, "/", ip)
+        image = BytesIO()
+        Image.new("RGB", (16, 16), "green").save(image, format="PNG")
+        image.seek(0)
+        result = {
+            "top_disease": "healthy",
+            "top_confidence_percentage": 91.0,
+            "prediction_set": ["healthy"],
+            "set_size": 1,
+        }
+        response = client.post(
+            "/api/history/save",
+            data={"image": (image, "leaf.png"), "result": json.dumps(result)},
+            headers={"X-CSRFToken": csrf_token},
+            content_type="multipart/form-data",
+            environ_base={"REMOTE_ADDR": ip},
+        )
+        self.assertEqual(response.status_code, 201)
+        history = client.get("/history", environ_base={"REMOTE_ADDR": ip})
+        self.assertEqual(history.status_code, 200)
+        self.assertIn(b"healthy", history.data)
+
+
+if __name__ == "__main__":
+    unittest.main()

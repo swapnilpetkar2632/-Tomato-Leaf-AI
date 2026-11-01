@@ -1,0 +1,56 @@
+# Python & Virtual Environment
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS System Files
+.DS_Store
+Thumbs.db
+
+# Local logs & temporary uploads
+*.log
+temp/
+upload_*
+
+# Local account database and saved scan thumbnails
+instance/
+*.db
+
+# Training data is not required for web inference
+data/train/
+data/calib/
+data/test/
+
+# Local QA artifacts
+qa-artifacts/
+
+# Rebuilt during deployment from model_parts/
+model.pth

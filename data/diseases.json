@@ -1,0 +1,331 @@
+{
+  "Tomato_Bacterial_spot": {
+    "slug": "bacterial-spot",
+    "name": "Bacterial spot",
+    "type": "bacterial",
+    "summary": "Small dark leaf spots, often with yellow halos, that can also mark stems and fruit.",
+    "overview": "Bacterial spot is a group of related bacterial diseases that can affect tomato leaves, stems, petioles and fruit. Early symptoms can look like several fungal leaf-spot diseases, so a photo is only a starting point.",
+    "causes": {
+      "pathogen": "Several Xanthomonas species can cause bacterial spot.",
+      "conditions": "Warm, humid weather, frequent rain or overhead irrigation, wet foliage and contaminated seed, transplants, tools or plant debris favor infection."
+    },
+    "symptoms": {
+      "leaves": "Small brown or dark circular spots may have a yellow halo. Centers can fall out and leave a shot-hole appearance; concentric rings are less typical than in early blight.",
+      "stems": "Small dark spots or blotchy lesions may appear on stems and petioles.",
+      "fruit": "Green or ripe fruit can develop raised brown, corky or scabby spots, sometimes with a pale halo."
+    },
+    "duration": "New lesions can appear quickly during warm, wet periods and the disease may continue through the season while foliage stays wet.",
+    "effects": "Severe infection can reduce leaf area, expose fruit to sun injury and make fruit less marketable. Yield impact depends on timing, cultivar and weather.",
+    "spread": "Rain splash, overhead irrigation, hands, tools, infected seed or transplants and crop debris can move the bacteria between plants.",
+    "prevention": [
+      "Start with reputable, disease-free seed and transplants.",
+      "Water at the soil line and improve spacing and airflow so leaves dry quickly.",
+      "Sanitize tools and remove or bury crop debris after harvest.",
+      "Rotate away from tomato and pepper when practical."
+    ],
+    "management": [
+      "Scout lower leaves and remove badly affected tissue without removing most of the canopy at once.",
+      "Avoid working among plants while foliage is wet.",
+      "Ask a local extension or agricultural officer about locally registered products and resistance concerns; follow every label and harvest interval.",
+      "Get a laboratory diagnosis if the distinction from early blight, Septoria or target spot will change management."
+    ],
+    "similar": ["Tomato_Early_blight", "Tomato_Septoria_leaf_spot", "Tomato_Target_Spot"],
+    "symptom_snapshot": "Tiny dark spots and possible yellow halos; usually no clear concentric rings."
+  },
+  "Tomato_Early_blight": {
+    "slug": "early-blight",
+    "name": "Early blight",
+    "type": "fungal",
+    "summary": "Brown target-like spots that often begin on older, lower leaves and move upward.",
+    "overview": "Early blight is a common tomato disease caused by Alternaria fungi. It often starts in older foliage near the soil and may affect leaves, stems and fruit.",
+    "causes": {
+      "pathogen": "Alternaria solani and related Alternaria species are associated with early blight.",
+      "conditions": "Warm temperatures, leaf wetness, heavy dew, rain splash and infected crop debris create favorable conditions."
+    },
+    "symptoms": {
+      "leaves": "Round to irregular brown spots enlarge into target-like concentric rings, often with yellow tissue around them. Older leaves may yellow, dry and drop.",
+      "stems": "Dark, dry lesions can form on stems, especially near the soil line or on older branches.",
+      "fruit": "Dark, leathery spots with raised rings may develop near the stem end of fruit."
+    },
+    "duration": "The disease can repeat in cycles during a warm, wet growing season; new spots may develop within days when foliage remains wet.",
+    "effects": "Defoliation can reduce plant vigor and expose fruit to sunscald. Fruit damage and yield loss are more likely when infection is early or severe.",
+    "spread": "Spores move from infected debris and weeds by rain splash, wind, handling and equipment. The pathogen can survive between crops in residue.",
+    "prevention": [
+      "Use mulch to reduce soil splash and keep lower leaves away from wet soil.",
+      "Stake or cage plants, prune carefully and provide good air movement.",
+      "Water at the base in the morning and remove diseased residue after harvest.",
+      "Rotate tomato and other susceptible solanaceous crops when practical."
+    ],
+    "management": [
+      "Remove the most affected leaves early while preserving enough healthy foliage for the plant.",
+      "Avoid overhead irrigation and disinfect tools between plants.",
+      "Ask a local agricultural professional about resistant varieties and registered fungicide options; products are often preventive and must be used by label.",
+      "Compare target-like rings with the smaller spots of Septoria and bacterial spot before deciding on treatment."
+    ],
+    "similar": ["Tomato_Septoria_leaf_spot", "Tomato_Bacterial_spot", "Tomato_Target_Spot"],
+    "symptom_snapshot": "Brown spots with visible concentric rings, often beginning on lower leaves."
+  },
+  "Tomato_Late_blight": {
+    "slug": "late-blight",
+    "name": "Late blight",
+    "type": "fungal",
+    "summary": "Large water-soaked brown blotches that can spread rapidly in cool, wet weather.",
+    "overview": "Late blight is caused by the water mold Phytophthora infestans. It can affect leaves, stems and fruit and may progress quickly when conditions are cool and wet.",
+    "causes": {
+      "pathogen": "Phytophthora infestans, a fungal-like water mold.",
+      "conditions": "Cool, damp weather, prolonged leaf wetness, rain, high humidity and infected plant material favor spread."
+    },
+    "symptoms": {
+      "leaves": "Large irregular water-soaked or olive-to-brown blotches can cross leaf veins. In humid conditions, pale growth may appear at lesion edges or undersides.",
+      "stems": "Firm dark brown lesions can expand along stems and petioles, causing rapid wilt or collapse.",
+      "fruit": "Firm dark brown spots can cover large areas of fruit and may become soft after secondary organisms enter."
+    },
+    "duration": "Under favorable weather, new infections and spread can be very fast, sometimes over only a few days.",
+    "effects": "Severe outbreaks can destroy foliage and fruit and may cause major crop loss. Urgent confirmation is sensible when symptoms spread quickly.",
+    "spread": "Windborne spores, rain splash, infected transplants, volunteer plants and infected potato or tomato material can spread the pathogen.",
+    "prevention": [
+      "Inspect transplants and avoid bringing suspect material into a crop.",
+      "Improve airflow, avoid wet foliage and remove volunteer potato or tomato plants.",
+      "Monitor local disease alerts during cool, wet weather.",
+      "Remove infected debris responsibly and do not save seed or fruit from suspect plants."
+    ],
+    "management": [
+      "Separate suspect plants and seek prompt confirmation from a local plant clinic or agricultural officer.",
+      "Do not rely on a photograph alone when the disease is spreading rapidly.",
+      "Ask about locally registered protective products and resistance management; follow the label exactly.",
+      "Do not compost heavily infected material unless the local guidance says the process is suitable."
+    ],
+    "similar": ["Tomato_Early_blight", "Tomato_Target_Spot", "Tomato_Leaf_Mold"],
+    "symptom_snapshot": "Large irregular blotches with a water-soaked look and unusually rapid spread."
+  },
+  "Tomato_Leaf_Mold": {
+    "slug": "leaf-mold",
+    "name": "Leaf mold",
+    "type": "fungal",
+    "summary": "Yellow-green upper-leaf patches with olive, velvety growth on the underside in humid shelters.",
+    "overview": "Tomato leaf mold is most often a greenhouse or high-tunnel problem. It is caused by Passalora fulva and is strongly associated with high humidity and limited airflow.",
+    "causes": {
+      "pathogen": "Passalora fulva, formerly called Fulvia fulva or Cladosporium fulvum.",
+      "conditions": "Relative humidity above about 85%, condensation, crowded plants and poor ventilation encourage disease."
+    },
+    "symptoms": {
+      "leaves": "Pale yellow or green spots appear on the upper surface; olive-green to brown velvety growth may appear directly beneath them.",
+      "stems": "Stem symptoms are less prominent but darkened areas may occur on affected plant tissue.",
+      "fruit": "Blossoms may darken and fall. Fruit can develop a smooth black area near the stem that becomes sunken and leathery."
+    },
+    "duration": "New spore cycles can form in roughly one to two weeks when humidity remains high, allowing repeated spread in protected culture.",
+    "effects": "Severe leaf loss reduces photosynthesis and can reduce yield; blossom and fruit infection can add direct losses.",
+    "spread": "Spores move by air currents, water, tools, workers and possibly insects. Seed and plant debris can introduce or carry the pathogen.",
+    "prevention": [
+      "Ventilate greenhouses and tunnels and reduce condensation overnight.",
+      "Space, stake and prune plants to improve airflow without excessive leaf removal.",
+      "Water at the base and sanitize tools, supports and work surfaces.",
+      "Remove crop residue and consider locally suitable resistant varieties."
+    ],
+    "management": [
+      "Reduce humidity and remove the most affected leaves carefully.",
+      "Increase air movement and keep foliage dry; cultural changes are central to control.",
+      "Ask a local professional about registered products for protected culture and follow greenhouse restrictions on the label.",
+      "Confirm the underside of the leaf because several problems can create yellow upper-surface patches."
+    ],
+    "similar": ["Tomato_Early_blight", "Tomato_Late_blight", "Tomato_Septoria_leaf_spot"],
+    "symptom_snapshot": "Yellow upper patches paired with olive velvety growth underneath, especially in humid shelters."
+  },
+  "Tomato_Septoria_leaf_spot": {
+    "slug": "septoria-leaf-spot",
+    "name": "Septoria leaf spot",
+    "type": "fungal",
+    "summary": "Many small spots with dark margins, pale centers and tiny dark specks, usually on lower leaves.",
+    "overview": "Septoria leaf spot is caused by Septoria lycopersici. It mainly damages foliage and can defoliate a plant when wet weather allows repeated infection.",
+    "causes": {
+      "pathogen": "Septoria lycopersici, a fungus that survives in infected debris and can be carried on seed or transplants.",
+      "conditions": "High humidity, leaf wetness, rain splash and moderate temperatures favor infection."
+    },
+    "symptoms": {
+      "leaves": "Small circular spots have a dark border and tan or gray center. Tiny black fruiting bodies may appear in the center as spots mature.",
+      "stems": "Spots can occur on stems, petioles and sepals, although leaves are usually the most noticeable site.",
+      "fruit": "Fruit is rarely affected directly; defoliation can expose fruit to sunscald."
+    },
+    "duration": "The disease can produce repeated infection cycles through a wet season, often moving from lower leaves upward.",
+    "effects": "Heavy defoliation weakens the plant and exposes fruit. Early, widespread infection can reduce crop quality and yield.",
+    "spread": "Spores spread by rain or irrigation splash, tools, hands, insects and infected plant residue.",
+    "prevention": [
+      "Use mulch to limit splash from soil and keep lower leaves dry.",
+      "Water at the plant base, provide airflow and avoid handling wet plants.",
+      "Remove infected leaves and residue, but do not strip more foliage than necessary.",
+      "Rotate crops and use clean seed or transplants."
+    ],
+    "management": [
+      "Scout lower leaves and remove the first affected leaves when practical.",
+      "Sanitize tools and wash hands after handling suspect plants.",
+      "Ask a local agricultural officer about resistant varieties and registered protectants; follow labels and harvest intervals.",
+      "Compare the small pale-centered spots with the rings of early blight and the halos of bacterial spot."
+    ],
+    "similar": ["Tomato_Early_blight", "Tomato_Bacterial_spot", "Tomato_Target_Spot"],
+    "symptom_snapshot": "Numerous small pale-centered spots with dark edges and tiny black specks."
+  },
+  "Tomato_Spider_mites": {
+    "slug": "spider-mites",
+    "name": "Spider mites",
+    "type": "pest",
+    "summary": "Fine stippling, yellowing and webbing caused by tiny mites, often during hot, dry conditions.",
+    "overview": "Spider mites are very small plant-feeding pests rather than a disease. They often hide on leaf undersides and can be difficult to confirm from a single image.",
+    "causes": {
+      "pathogen": "Common tomato problems involve two-spotted or related spider mites in the Tetranychus group.",
+      "conditions": "Hot, dry weather, dusty conditions, plant stress and loss of natural enemies can favor population growth."
+    },
+    "symptoms": {
+      "leaves": "Fine pale stippling develops into yellow or bronze foliage. Turn leaves over to look for tiny moving mites, cast skins or fine webbing.",
+      "stems": "Heavy infestations may leave webbing around petioles and growing tips.",
+      "fruit": "Fruit is usually affected indirectly through loss of healthy foliage and plant vigor rather than by distinctive fruit lesions."
+    },
+    "duration": "Several generations can develop quickly in hot conditions, so damage may increase noticeably over days to weeks.",
+    "effects": "Feeding reduces photosynthesis, weakens plants and can cause early leaf drop. Severe pressure can reduce fruit size and yield.",
+    "spread": "Mites can move by wind, people, tools, plant material and contact between touching leaves.",
+    "prevention": [
+      "Reduce plant stress and wash dusty foliage gently when appropriate.",
+      "Inspect leaf undersides and new plants before bringing them near the crop.",
+      "Protect beneficial predators and avoid unnecessary broad-spectrum insecticides.",
+      "Keep weeds and volunteer plants monitored around the crop."
+    ],
+    "management": [
+      "Confirm mites or webbing on leaf undersides before choosing a response.",
+      "Use a strong but plant-safe water spray where appropriate and repeat monitoring.",
+      "Ask a local professional about registered miticides, insecticidal soaps or oils for the crop and conditions; follow labels and test for plant sensitivity.",
+      "Avoid assuming every yellow or stippled leaf is a mite problem."
+    ],
+    "similar": ["Tomato_Yellow_Leaf_Curl_Virus", "Tomato_healthy", "Tomato_Leaf_Mold"],
+    "symptom_snapshot": "Fine pale stippling, underside webbing and tiny moving pests in hot, dry conditions."
+  },
+  "Tomato_Target_Spot": {
+    "slug": "target-spot",
+    "name": "Target spot",
+    "type": "fungal",
+    "summary": "Brown leaf and fruit lesions that may develop concentric rings and expand in warm, wet weather.",
+    "overview": "Target spot is a fungal disease that can affect tomato leaves, stems and fruit. It may resemble early blight or bacterial spot, especially in early stages.",
+    "causes": {
+      "pathogen": "Target spot is commonly associated with Corynespora cassiicola.",
+      "conditions": "Warm temperatures, high humidity, extended leaf wetness, dense canopies and rain or overhead irrigation favor disease."
+    },
+    "symptoms": {
+      "leaves": "Small brown spots can enlarge and form tan or dark concentric rings; surrounding tissue may yellow and spots may merge.",
+      "stems": "Dark elongated lesions may form on stems and petioles.",
+      "fruit": "Fruit can develop sunken, dark lesions, often near the shoulder or stem area, sometimes with ringed patterns."
+    },
+    "duration": "Disease cycles repeat during warm, humid weather and can move up the canopy when foliage remains wet.",
+    "effects": "Leaf loss reduces photosynthesis and fruit lesions reduce marketability. Severity varies with cultivar, environment and timing.",
+    "spread": "Spores move by wind, rain splash, irrigation, tools, workers and infected plant residue.",
+    "prevention": [
+      "Use clean transplants, good spacing and trellising to improve airflow.",
+      "Water at the base and avoid working the crop while leaves are wet.",
+      "Remove crop residue and manage volunteer plants and weeds.",
+      "Rotate crops when practical and monitor lower leaves early."
+    ],
+    "management": [
+      "Remove severely affected tissue while keeping enough healthy foliage for the plant.",
+      "Reduce leaf wetness and sanitize tools between plants.",
+      "Ask a local agricultural professional about registered fungicides and resistance management; follow the product label.",
+      "Seek confirmation if target spot, early blight or bacterial spot would lead to different decisions."
+    ],
+    "similar": ["Tomato_Early_blight", "Tomato_Bacterial_spot", "Tomato_Septoria_leaf_spot"],
+    "symptom_snapshot": "Brown lesions with possible concentric rings on leaves, stems or fruit."
+  },
+  "Tomato_Yellow_Leaf_Curl_Virus": {
+    "slug": "yellow-leaf-curl-virus",
+    "name": "Tomato yellow leaf curl virus",
+    "type": "viral",
+    "summary": "Leaf curling, yellowing and stunting commonly associated with whitefly-transmitted virus infection.",
+    "overview": "Tomato yellow leaf curl virus can cause severe growth and yield problems. Visual symptoms overlap with other viruses, herbicide injury and nutrient or environmental stress, so confirmation may require a plant clinic or lab.",
+    "causes": {
+      "pathogen": "Tomato yellow leaf curl virus and related begomoviruses; the exact virus depends on region.",
+      "conditions": "Whiteflies can acquire and spread the virus. Warm conditions and infected plants or weeds can sustain the disease cycle."
+    },
+    "symptoms": {
+      "leaves": "Young leaves may curl upward, become smaller, yellow between veins and show a cupped or stiff appearance.",
+      "stems": "Plants may be shortened, branched or stunted; young growth can remain crowded and pale.",
+      "fruit": "Flower drop, poor fruit set and small or uneven fruit can follow early infection."
+    },
+    "duration": "An infected plant does not recover from virus infection; symptoms and yield effects continue as new growth develops.",
+    "effects": "Early infection can severely stunt plants, reduce flowering and reduce fruit number or size.",
+    "spread": "Whiteflies transmit the virus from infected plants. Transplants, weeds and volunteer plants can help introduce or maintain infection.",
+    "prevention": [
+      "Use healthy transplants and monitor for whiteflies on leaf undersides.",
+      "Remove heavily symptomatic plants when local guidance recommends it and manage weed hosts.",
+      "Use regionally appropriate resistant varieties where available.",
+      "Use screens or exclusion methods in protected culture when suitable."
+    ],
+    "management": [
+      "Treat the result as a suspicion, not a confirmed virus diagnosis.",
+      "Control the vector and remove infected sources according to local extension guidance.",
+      "Ask an agricultural officer about locally registered whitefly management options; follow labels and protect beneficial insects.",
+      "Submit a sample for laboratory confirmation when the crop value or management decision warrants it."
+    ],
+    "similar": ["Tomato_mosaic_virus", "Tomato_Spider_mites", "Tomato_healthy"],
+    "symptom_snapshot": "New leaves curl and yellow while the plant becomes shortened or stunted."
+  },
+  "Tomato_healthy": {
+    "slug": "healthy",
+    "name": "Healthy leaf",
+    "type": "healthy",
+    "summary": "A reference class for leaves without strong visual evidence of the labeled diseases.",
+    "overview": "The healthy class means the model found the uploaded image most similar to healthy examples in its training data. It is not a guarantee that the whole plant is disease-free.",
+    "causes": {
+      "pathogen": "No disease pathogen is implied by this reference class.",
+      "conditions": "Healthy leaves usually have even green color, normal shape and no strong pattern of lesions, webbing or distortion."
+    },
+    "symptoms": {
+      "leaves": "Even green color, intact tissue and normal leaf shape are common reference features.",
+      "stems": "Stems should be firm and free of suspicious lesions or collapse.",
+      "fruit": "A leaf photo cannot assess fruit condition; inspect flowers and fruit separately."
+    },
+    "duration": "Plant health can change after the photo. Continue scouting during the growing season.",
+    "effects": "A healthy-looking leaf supports growth, but hidden, early or non-leaf problems may still be present.",
+    "spread": "No spread is implied by this class. Continue hygiene and monitoring practices.",
+    "prevention": [
+      "Maintain appropriate spacing, airflow, irrigation and nutrition.",
+      "Scout both upper and lower leaf surfaces and inspect stems and fruit.",
+      "Remove plant debris and sanitize tools between suspect plants.",
+      "Use local integrated pest-management guidance when conditions change."
+    ],
+    "management": [
+      "No treatment is suggested by the healthy reference class.",
+      "If the plant looks different in person, take several clear photos and seek local advice.",
+      "Do not use a healthy model result to override obvious field symptoms."
+    ],
+    "similar": ["Tomato_Spider_mites", "Tomato_Yellow_Leaf_Curl_Virus", "Tomato_mosaic_virus"],
+    "symptom_snapshot": "Even green tissue and normal shape in the photographed leaf; inspect the whole plant too."
+  },
+  "Tomato_mosaic_virus": {
+    "slug": "mosaic-virus",
+    "name": "Tomato mosaic virus",
+    "type": "viral",
+    "summary": "Mottled light and dark green leaves, distortion and possible plant stunting caused by a virus.",
+    "overview": "Tomato mosaic virus is one of several viruses that can affect tomatoes. Visual patterns overlap between viruses and other stresses, so a photo cannot confirm the exact virus.",
+    "causes": {
+      "pathogen": "Tomato mosaic virus (ToMV) is a tobamovirus; related viruses can cause similar symptoms.",
+      "conditions": "The virus can persist on contaminated plant material and spread through sap, tools, hands, seed and contact between plants."
+    },
+    "symptoms": {
+      "leaves": "Light and dark green mosaic, mottling, curling, narrowing or distorted leaflets may appear.",
+      "stems": "Growth may be shortened or irregular; symptoms can vary with cultivar, plant age and environmental conditions.",
+      "fruit": "Fruit may ripen unevenly, be smaller or show internal or surface discoloration in some infections."
+    },
+    "duration": "Virus-infected plants do not recover, and symptoms can remain or intensify as new growth develops.",
+    "effects": "Early infection can reduce vigor, fruit number and fruit size. Effects vary by strain, cultivar and plant age.",
+    "spread": "Sap on hands, tools, stakes, clothing, plant contact, infected seed and crop residue can spread tobamoviruses.",
+    "prevention": [
+      "Use clean seed and healthy transplants from reputable sources.",
+      "Wash hands and sanitize tools after handling suspect plants.",
+      "Avoid tobacco products around tomato work because tobamoviruses can be carried in plant residue.",
+      "Remove volunteer plants and manage crop debris responsibly."
+    ],
+    "management": [
+      "Treat visual identification as provisional and seek lab confirmation when important.",
+      "Remove confirmed infected plants where local guidance recommends it to reduce sources.",
+      "Do not save seed from suspect plants and avoid propagating cuttings from them.",
+      "Ask a local agricultural officer about resistant varieties and sanitation practices."
+    ],
+    "similar": ["Tomato_Yellow_Leaf_Curl_Virus", "Tomato_healthy", "Tomato_Spider_mites"],
+    "symptom_snapshot": "Mottled light and dark green leaves with possible curling, distortion or stunting."
+  }
+}

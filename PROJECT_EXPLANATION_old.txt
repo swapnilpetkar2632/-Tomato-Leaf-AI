@@ -1,0 +1,492 @@
+TOMATO LEAF CONFORMAL PREDICTION PROJECT
+========================================
+
+1. PROJECT PURPOSE
+------------------
+
+This project is a tomato-leaf disease classification web application.
+It uses a PyTorch ResNet18 model to classify tomato-leaf images into ten
+classes and uses split conformal prediction to produce a set of possible
+classes instead of relying only on one model prediction.
+
+The project also contains a Flask web interface, dataset validation tools,
+test evaluation, and a separate exploratory audit for out-of-distribution
+(OOD) images.
+
+The ten supported classes are:
+
+1. Tomato_Bacterial_spot
+2. Tomato_Early_blight
+3. Tomato_Late_blight
+4. Tomato_Leaf_Mold
+5. Tomato_Septoria_leaf_spot
+6. Tomato_Spider_mites
+7. Tomato_Target_Spot
+8. Tomato_Yellow_Leaf_Curl_Virus
+9. Tomato_healthy
+10. Tomato_mosaic_virus
+
+
+2. COMPLETE PROJECT WORKFLOW
+----------------------------
+
+Raw image folders
+        |
+        v
+split_data.py
+        |
+        +--> data/train  --> train.py     --> model.pth
+        |                                      class_mapping.json
+        |
+        +--> data/calib  --> calibrate.py --> threshold.json
+        |
+        +--> data/test   --> evaluate.py  --> results.txt
+        |
+        +--> D:\ood      --> evaluate_ood.py --> ood_results.txt
+
+model.pth + threshold.json
+        |
+        v
+predict.py
+        |
+        v
+app.py and Flask web interface
+
+
+3. DATASET PREPARATION
+----------------------
+
+split_data.py validates and prepares the dataset.
+
+It performs the following tasks:
+
+- Requires all ten expected tomato classes.
+- Supports JPG, JPEG, PNG, BMP, WebP, and TIFF images.
+- Creates a 70 percent training split.
+- Creates a 15 percent calibration split.
+- Creates a 15 percent test split.
+- Uses deterministic random seed 42.
+- Rejects missing class folders.
+- Rejects unexpected class folders.
+- Rejects duplicate folder mappings.
+- Rejects empty class folders.
+- Rejects class folders that are too small to create non-empty train,
+  calibration, and test subsets.
+- Validates already-existing train, calibration, and test directories.
+
+The current project dataset contains approximately:
+
+- 12,707 training images
+- 2,725 calibration images
+- 2,728 test images
+- 18,160 total images
+
+The command is:
+
+    python split_data.py
+
+To process another dataset root:
+
+    python split_data.py --src "C:\path\to\tomato_dataset"
+
+
+4. MODEL TRAINING
+-----------------
+
+train.py trains a ResNet18 image-classification model.
+
+The model uses ImageNet-pretrained ResNet18 weights. The early layers are
+frozen, while layer3 and layer4 are fine-tuned for tomato-leaf images.
+
+The final classification head is:
+
+    ResNet18 feature extractor
+        -> Linear layer with 256 units
+        -> ReLU activation
+        -> Dropout
+        -> Linear layer with 10 output classes
+
+Training settings include:
+
+- Batch size: 128
+- Epochs: 4
+- Learning rate: 0.0005
+- Optimizer: Adam
+- Loss: cross-entropy
+- Scheduler: ReduceLROnPlateau
+- Up to 250 images per class are used.
+- Ten percent of the selected images are used for validation.
+- The model with the lowest validation loss is saved.
+
+Training may download ImageNet weights during the first run.
+
+Training generates:
+
+- model.pth
+- class_mapping.json
+
+Training can overwrite those files, so it should not be run casually when
+the existing artifacts need to be preserved.
+
+
+5. CLASS MAPPING
+----------------
+
+class_mapping.py keeps class names and numeric class indexes consistent.
+
+The model uses numeric indexes such as:
+
+    Tomato_Bacterial_spot       -> 0
+    Tomato_Early_blight         -> 1
+    Tomato_Late_blight          -> 2
+    ...
+    Tomato_mosaic_virus         -> 9
+
+The mapping is checked during training, calibration, evaluation, and
+inference. If the dataset mapping and saved mapping differ, the pipeline
+stops with an error instead of silently producing incorrect labels.
+
+
+6. CONFORMAL CALIBRATION
+------------------------
+
+calibrate.py calculates the conformal threshold q_hat.
+
+For every calibration image, the model generates softmax probabilities.
+The nonconformity score is calculated as:
+
+    score = 1 - probability_of_true_class
+
+A correctly classified image with high confidence has a small score. An
+uncertain or incorrectly classified image has a larger score.
+
+The project uses:
+
+    alpha = 0.10
+    target coverage = 75 percent
+
+The calibration script uses a deterministic class-stratified sample of up
+to 500 calibration images. The resulting threshold is saved in:
+
+    threshold.json
+
+The checked-in threshold currently contains approximately:
+
+    q_hat = 0.0054
+    target coverage = 75 percent
+    calibration sample count = 500
+
+
+7. CONFORMAL PREDICTION SETS
+----------------------------
+
+conformal_sets.py applies the shared conformal prediction rule:
+
+    C(x) = { class | 1 - probability(class) <= q_hat }
+
+This is equivalent to:
+
+    probability(class) >= 1 - q_hat
+
+With the current q_hat value:
+
+    1 - 0.0054 = approximately 0.9946
+
+Therefore, a class generally needs a probability near or above 98.5 percent
+to enter the conformal candidate set.
+
+A prediction set may contain:
+
+    {Tomato_Late_blight}
+
+or multiple classes:
+
+    {Tomato_Early_blight, Tomato_Late_blight}
+
+or no classes:
+
+    {}
+
+An empty conformal set remains empty. The application does not add a guessed
+class and incorrectly describe it as a conformal result.
+
+
+8. TEST EVALUATION
+------------------
+
+evaluate.py evaluates prediction sets on the test split.
+
+It calculates:
+
+- Empirical coverage.
+- Average prediction-set size.
+- Number of empty sets.
+- Prediction-set size distribution.
+- Per-class coverage.
+
+The checked-in results.txt currently reports:
+
+    Target coverage:     75.00 percent
+    Empirical coverage:  77.80 percent (389/500)
+    Average set size:    0.78 classes
+    Empty sets:          111/500
+
+The empirical result is a sample measurement and is currently above the 75
+percent target. The 75 percent value is a
+calibration target under assumptions; it is not a guarantee that every
+future test sample will achieve exactly 75 percent.
+
+The evaluation sample is now deterministic and class-stratified when the
+test dataset contains more than 500 images.
+
+
+9. IMAGE INFERENCE
+------------------
+
+predict.py performs inference for individual images.
+
+Preprocessing is:
+
+1. Resize to 256 pixels.
+2. Center crop to 224 by 224 pixels.
+3. Convert to a tensor.
+4. Normalize using ImageNet mean and standard deviation.
+
+Inference then:
+
+1. Loads the model and calibration threshold.
+2. Validates the input image.
+3. Runs the ResNet18 model.
+4. Calculates softmax probabilities.
+5. Finds the top predicted class.
+6. Builds the conformal prediction set.
+7. Returns confidence and uncertainty information.
+
+The model is cached in memory after the first prediction so it does not need
+to be loaded again for every uploaded image.
+
+The command-line inference utility supports all configured image extensions.
+
+
+10. CONFIDENCE HANDLING
+-----------------------
+
+The project reports two different concepts:
+
+A. Conformal prediction set
+
+This is the mathematically defined set based on q_hat. It may be empty.
+
+B. Top softmax confidence
+
+This is the largest raw probability produced by the neural network. It is
+only a display heuristic and is not a calibrated probability guarantee.
+
+The web UI now checks the top softmax confidence. If it is below 75 percent,
+the UI shows:
+
+    Top confidence is below 75 percent. Please upload a clear, well-lit
+    image showing a single tomato leaf.
+
+This message is user guidance only. It does not prove that the image is
+invalid, non-leaf, or out-of-distribution.
+
+The existing 20 percent softmax screen is also only a heuristic. It is not a
+validated OOD detector.
+
+
+11. FLASK WEB APPLICATION
+-------------------------
+
+app.py provides the Flask application.
+
+The main routes are:
+
+GET /
+
+Loads the web interface and shows:
+
+- The calibrated target coverage.
+- The latest empirical evaluation result.
+- The image upload interface.
+
+POST /api/predict
+
+Accepts an uploaded image and returns JSON containing:
+
+- Top predicted disease.
+- Top confidence percentage.
+- Conformal prediction set.
+- Prediction-set size.
+- All class confidences.
+- Low-confidence status.
+- Heuristic leaf-screen status.
+
+The upload endpoint includes:
+
+- A 16 MB upload limit.
+- Pillow image validation.
+- Temporary-file processing.
+- Temporary-file cleanup.
+- Generic error messages for internal failures.
+
+The application runs at:
+
+    http://127.0.0.1:5000
+
+
+12. WEB INTERFACE
+-----------------
+
+templates/index.html provides:
+
+- Drag-and-drop upload.
+- File browser upload.
+- Image preview.
+- Change-image button.
+- Analyze button.
+- Candidate-class display.
+- Softmax-confidence bars.
+- Empty conformal-set warning.
+- Below-75-percent confidence warning.
+- Backend error handling.
+
+The 75 percent warning is based on the best class score. It is not triggered
+because one of the lower-ranked classes has a score below 75 percent.
+
+
+13. OOD IMAGE AUDIT
+-------------------
+
+evaluate_ood.py evaluates unlabeled images separately from the normal test
+evaluation.
+
+The configured OOD directory is:
+
+    D:\ood
+
+The audit does not use OOD images for training, calibration, or test coverage.
+It reports:
+
+- Number of images audited.
+- Mean top softmax score.
+- Minimum and maximum top score.
+- Percentage passing the 20 percent heuristic.
+- Number of empty prediction sets.
+- Prediction-set size distribution.
+
+The audit was run on 102 images and produced:
+
+    Images audited:       102
+    Mean top score:       0.8509
+    Minimum top score:    0.2956
+    Maximum top score:    1.0000
+    20 percent passed:    102/102
+    Empty sets:           72/102
+
+The fact that all 102 OOD images passed the 20 percent screen demonstrates
+that this heuristic is not a reliable OOD detector.
+
+Run the audit with:
+
+    python evaluate_ood.py --src "D:\ood"
+
+The separate output is written to:
+
+    ood_results.txt
+
+
+14. PROJECT LIMITATIONS
+-----------------------
+
+The project does not provide:
+
+- A guarantee for every individual image.
+- Per-class 75 percent coverage.
+- A reliable non-leaf detector.
+- A validated arbitrary-OOD detector.
+- Medical diagnosis.
+- Production authentication or user management.
+- Production-grade deployment security.
+
+Split conformal coverage is a marginal in-distribution guarantee under
+assumptions such as exchangeability between calibration and future images.
+Those assumptions may not hold for arbitrary user-uploaded images.
+
+
+15. IMPORTANT PROJECT FILES
+----------------------------
+
+app.py                 Flask server and API endpoints
+predict.py             Inference engine
+train.py               ResNet18 training
+calibrate.py           Conformal threshold calculation
+evaluate.py            Test coverage evaluation
+evaluate_ood.py        Exploratory OOD audit
+split_data.py          Dataset validation and splitting
+conformal_sets.py      Shared conformal-set rule
+class_mapping.py       Class and index validation
+paths.py               Project-relative paths
+dataset_validation.py  Dataset structure validation
+sampling.py            Deterministic stratified sampling
+artifact_io.py         Atomic artifact writes
+model.pth              Saved model weights
+threshold.json         Saved conformal threshold
+class_mapping.json     Saved class mapping
+results.txt            Checked-in test evaluation
+ood_results.txt        OOD audit report
+templates/index.html   Web interface
+tests/                 Runtime contract tests
+
+
+16. RUN COMMANDS
+----------------
+
+To verify the environment:
+
+    python verify_env.py
+
+To validate or create the dataset split:
+
+    python split_data.py
+
+To train the model:
+
+    python train.py
+
+To calibrate the conformal threshold:
+
+    python calibrate.py
+
+To evaluate test coverage:
+
+    python evaluate.py
+
+To audit OOD images:
+
+    python evaluate_ood.py --src "D:\ood"
+
+To start the web application using the existing artifacts:
+
+    python app.py
+
+Training, calibration, and evaluation can overwrite generated artifacts.
+If the goal is only to use the current model, run app.py without rerunning
+the training pipeline.
+
+
+17. CURRENT VERIFICATION STATUS
+-------------------------------
+
+The project currently passes:
+
+- Python compilation checks.
+- Environment verification.
+- Dataset split validation.
+- Flask HTTP health check.
+- Valid-image prediction smoke test.
+- 17 runtime contract tests.
+- OOD audit on D:\ood.
+
+The existing model and calibration artifacts were preserved while these
+runtime and validation fixes were added.
